@@ -6,7 +6,6 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 const OPENWEATHER_API_KEY = '35969e08ae6c042dca65746208702818'; 
-var lat, lon;
 
 // 1. Weather Route
 app.get('/weather', async (req, res) => {
@@ -15,6 +14,7 @@ app.get('/weather', async (req, res) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric`;
     const response = await axios.get(url);
     res.json(response.data);
+    console.log(response.data);
   } catch (error) {
     res.status(500).send(error.toString());
   }
