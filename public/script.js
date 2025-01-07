@@ -64,8 +64,6 @@ async function weather() {
   }
 }
 
-
-
 document.getElementById('getWeatherBtn').addEventListener('click', weather);
 document.getElementById('cityInput').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') {
