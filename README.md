@@ -84,7 +84,3 @@ The application uses the following API keys:
 - Farida
 - Bekzhan
 - Group: IT-2306
-
-## License
-
-ISC License

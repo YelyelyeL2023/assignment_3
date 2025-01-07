@@ -207,3 +207,33 @@ nav a:hover {
     margin: 0 0 10px 0;
     color: #333;
 }
+
+.forecast-container {
+  margin: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.forecast-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.forecast-card h3 {
+  margin: 0 0 10px 0;
+  color: #009696;
+}
+
+.forecast-details {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.forecast-icon {
+  width: 50px;
+  height: 50px;
+  margin: 10px 0;
+}

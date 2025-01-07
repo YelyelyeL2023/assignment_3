@@ -21,6 +21,19 @@ app.get('/weather', async (req, res) => {
   }
 });
 
+//Bonus Route (14-day forecast)
+app.get('/forecast', async (req, res) => {
+  try {
+    const city = req.query.city || 'London';
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+    const response = await axios.get(url);
+    res.json(response.data);
+    console.log(response.data);
+  } catch (error) {
+    res.status(500).send(error.toString());
+  }
+});
+
 // 2. Movies Route
 app.get('/movies', async (req, res) => {
   try {

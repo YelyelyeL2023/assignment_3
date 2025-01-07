@@ -1,23 +1,24 @@
 let map;
 weather();
 
+function windDirection(degree) {
+  if (degree>337.5) return 'N';
+  if (degree>292.5) return 'NW';
+  if(degree>247.5) return 'W';
+  if(degree>202.5) return 'SW';
+  if(degree>157.5) return 'S';
+  if(degree>122.5) return 'SE';
+  if(degree>67.5) return 'E';
+  if(degree>22.5) return 'NE';
+  return 'N';
+}
+
 async function weather() {
   const city = document.getElementById('cityInput').value || 'London';
   try {
     let weatherRes = await fetch(`/weather?city=${city}`);
     let weatherData = await weatherRes.json();
     
-    function windDirection(degree) {
-      if (degree>337.5) return 'N';
-      if (degree>292.5) return 'NW';
-      if(degree>247.5) return 'W';
-      if(degree>202.5) return 'SW';
-      if(degree>157.5) return 'S';
-      if(degree>122.5) return 'SE';
-      if(degree>67.5) return 'E';
-      if(degree>22.5) return 'NE';
-      return 'N';
-    }
 
     document.getElementById('weather').innerHTML = `
       <div class="weather-info">
@@ -71,3 +72,73 @@ document.getElementById('cityInput').addEventListener('keypress', function (e) {
     weather();
   } 
 });
+
+async function getForecast() {
+  const city = document.getElementById('cityInput').value || 'London';
+  try {
+    const response = await fetch(`/forecast?city=${encodeURIComponent(city)}`);
+    const data = await response.json();
+    console.log(data);
+    const forecastContainer = document.getElementById('forecast');
+    const dailyForecasts = processForecastData(data.list);
+    
+    forecastContainer.innerHTML = dailyForecasts
+      .map(day => `
+        <div class="forecast-card">
+          <h3>${new Date(day.dt * 1000).toLocaleDateString()}</h3>
+          <img class="forecast-icon" 
+               src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" 
+               alt="${day.weather[0].description}">
+          <div class="forecast-details">
+            <p>🌡️ ${Math.round(day.temp.max)}°C / ${Math.round(day.temp.min)}°C</p>
+            <p>💨 ${day.wind.speed} m/s ${windDirection(day.wind.deg)}</p>
+            <p>💧 ${day.humidity}%</p>
+            <p>☀️ ${new Date(day.sunrise * 1000).toLocaleTimeString()}</p>
+            <p>🌙 ${new Date(day.sunset * 1000).toLocaleTimeString()}</p>
+          </div>
+        </div>
+      `).join('');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+function processForecastData(list) {
+  const dailyData = {};
+  
+  list.forEach(item => {
+    const date = new Date(item.dt * 1000).toLocaleDateString();
+    if (!dailyData[date]) {
+      dailyData[date] = {
+        dt: item.dt,
+        temp: { min: item.main.temp, max: item.main.temp },
+        weather: [item.weather[0]],
+        wind: item.wind,
+        humidity: item.main.humidity,
+        sunrise: item.sys.sunrise,
+        sunset: item.sys.sunset
+      };
+    } else {
+      dailyData[date].temp.min = Math.min(dailyData[date].temp.min, item.main.temp);
+      dailyData[date].temp.max = Math.max(dailyData[date].temp.max, item.main.temp);
+    }
+  });
+  
+  return Object.values(dailyData);
+}
+
+// Update event listeners
+document.getElementById('getWeatherBtn').addEventListener('click', () => {
+  weather();
+  getForecast();
+});
+
+document.getElementById('cityInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    weather();
+    getForecast();
+  }
+});
+
+// Initial load
+getForecast();
