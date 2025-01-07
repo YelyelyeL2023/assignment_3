@@ -1,12 +1,22 @@
 let map;
+weather();
 
 async function weather() {
   const city = document.getElementById('cityInput').value || 'London';
   try {
     let weatherRes = await fetch(`/weather?city=${city}`);
     let weatherData = await weatherRes.json();
-    document.getElementById('weather').innerText =
-      JSON.stringify(weatherData, null, 2);
+    document.getElementById('weather').innerHTML = `
+      <div class="weather-info">
+        <img src="https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png" alt="Weather Icon" />
+        <div>
+          <h2>${weatherData.name}</h2>
+          <p>${weatherData.weather[0].main} (${weatherData.weather[0].description})</p>
+          <p>${weatherData.main.temp}°C</p>
+          <p>Humidity: ${weatherData.main.humidity}%</p>
+        </div>
+      </div>
+    `;
 
     if (!map) {
       map = L.map('map').setView([weatherData.coord.lat, weatherData.coord.lon], 6);
@@ -27,6 +37,8 @@ async function weather() {
     console.error(error);
   }
 }
+
+
 
 document.getElementById('getWeatherBtn').addEventListener('click', weather);
 document.getElementById('cityInput').addEventListener('keypress', function (e) {

@@ -50,3 +50,23 @@ body {
       height: 200px;
     }
   }
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+}
+.weather-info img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+.weather-info h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.4em;
+}
+.weather-info p {
+  margin: 2px 0;
+  font-weight: 500;
+}
