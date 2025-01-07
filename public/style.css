@@ -30,6 +30,12 @@ body {
     color: #333;
   }
   
+  #movieInput {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
   #cityInput {
     padding: 8px;
     border: 1px solid #ccc;

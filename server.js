@@ -44,10 +44,11 @@ app.get('/movies', async (req, res) => {
 // 3. Movie Quotes route
 app.get('/movie-quotes', async (req, res) => {
   try {
-      const response = await axios.get('https://quoteapi.pythonanywhere.com/random');
-      res.json(response.data);
+    const count = req.params.count || 1;
+    const response = await axios.get(`https://api.breakingbadquotes.xyz/v1/quotes/${count}`);
+    res.json(response.data);
   } catch (error) {
-      res.status(500).send(error.toString());
+    res.status(500).send(error.toString());
   }
 });
 
