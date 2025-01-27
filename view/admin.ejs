@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav>
+            <a href="/">Weather</a>
+            <a href="/movies.html">Movies</a>
+            <a href="/movie-quotes.html">Quotes</a>
+        </nav>
+    </header>
+    
+    <div class="admin-container">
+        <h2>User Management</h2>
+        <table>
+            <tr>
+                <th>Username</th>
+                <th>Created At</th>
+                <th>Admin Status</th>
+                <th>Actions</th>
+            </tr>
+            <% users.forEach(user => { %>
+                <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.createdAt.toLocaleDateString() %></td>
+                    <td><%= user.isAdmin ? 'Yes' : 'No' %></td>
+                    <td>
+                        <button onclick="editUser('<%= user._id %>')">Edit</button>
+                        <button onclick="deleteUser('<%= user._id %>')">Delete</button>
+                    </td>
+                </tr>
+            <% }) %>
+        </table>
+    </div>
+</body>
+</html>

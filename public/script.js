@@ -131,7 +131,6 @@ function processForecastData(list) {
   return Object.values(dailyData);
 }
 
-// Update event listeners
 document.getElementById('getWeatherBtn').addEventListener('click', () => {
   weather();
   getForecast();
@@ -144,5 +143,4 @@ document.getElementById('cityInput').addEventListener('keypress', function(e) {
   }
 });
 
-// Initial load
 getForecast();

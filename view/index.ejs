@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather App</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+  />
+</head>
+<body>
+  <header>
+    <h1>Weather</h1>
+    <%- include('partials/nav') %>
+    <div id="searchBox">
+      <input id="cityInput" type="text" placeholder="Enter city" />
+      <button id="getWeatherBtn">Get Weather</button>
+    </div>
+  </header>
+  <div id="weather"></div>
+  <div id="forecast" class="forecast-container"></div>
+  <div id="map" style="height: 400px;"></div>
+  <footer>© Yelarys, Farida, Bekzhan, IT-2306</footer>
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
