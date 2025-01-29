@@ -9,7 +9,7 @@ async function searchMovies() {
   
     try {
       container.innerHTML = '<p>Loading...</p>';
-      const response = await fetch(`/movies?title=${encodeURIComponent(query)}`);
+      const response = await fetch(`/api/movies?title=${encodeURIComponent(query)}`);
       const data = await response.json();
       
       if (!data.results || data.results.length === 0) {

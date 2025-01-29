@@ -3,7 +3,7 @@ async function getQuotes() {
     
     try {
         container.innerHTML = '<p>Loading...</p>';
-        const response = await fetch('/movie-quotes');
+        const response = await fetch('/api/movie-quotes');
         const [quote] = await response.json();
 
         container.innerHTML = `

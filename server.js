@@ -7,8 +7,11 @@ const bcrypt = require('bcrypt');
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+
 // MongoDB connection
-mongoose.connect('mongodb+srv://bzg:12341234@cluster0.vjb0u.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect('mongodb+srv://bzg:12341234@cluster0.vjb0u.mongodb.net/user_collection?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -38,7 +41,6 @@ async function createAdminUser() {
 }
 
 // Configure express
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.set('view engine', 'ejs');
@@ -102,13 +104,20 @@ app.get('/login', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
-  
-  if (user && await bcrypt.compare(password, user.password)) {
-    req.session.user = user;
-    return res.redirect('/');
-  } else {
-    return res.redirect('/login');
+
+  // If user doesn't exist
+  if (!user) {
+    return res.render('login', { errorMessage: 'User not found' });
   }
+
+  // If password doesn't match
+  if (!(await bcrypt.compare(password, user.password))) {
+    return res.render('login', { errorMessage: 'Invalid password' });
+  }
+
+  // If valid user
+  req.session.user = user;
+  return res.redirect('/');
 });
 
 app.get('/admin', requireAdmin, async (req, res) => {
@@ -158,8 +167,8 @@ app.get('/forecast', requireAuth, async (req, res) => {
   }
 });
 
-// 2. Movies Route
-app.get('/movies', requireAuth, async (req, res) => {
+// Existing API routes already prefixed with /api
+app.get('/api/movies', requireAuth, async (req, res) => {
   try {
     const title = req.query.title || 'inception';
     const response = await axios.get(`https://moviesdatabase.p.rapidapi.com/titles/search/title/${title}`, {
@@ -172,47 +181,78 @@ app.get('/movies', requireAuth, async (req, res) => {
         titleType: 'movie'
       }
     });
-    
-    // Log API request to history
+
     await new History({
       userId: req.session.user._id,
       requestType: 'movies',
       requestData: { title },
       responseData: response.data
     }).save();
-    
+
     res.json(response.data);
   } catch (error) {
     res.status(500).send(error.toString());
   }
 });
 
-// 3. Movie Quotes route
-app.get('/movie-quotes', requireAuth, async (req, res) => {
+app.get('/api/movie-quotes', requireAuth, async (req, res) => {
   try {
-    const count = req.params.count || 1;
+    const count = req.query.count || 1;
     const response = await axios.get(`https://api.breakingbadquotes.xyz/v1/quotes/${count}`);
-    
-    // Log API request to history
+
     await new History({
       userId: req.session.user._id,
       requestType: 'movie-quotes',
       requestData: { count },
       responseData: response.data
     }).save();
-    
+
     res.json(response.data);
   } catch (error) {
     res.status(500).send(error.toString());
   }
 });
 
-// Add after existing routes
+// Edit form route
+app.get('/admin/users/edit/:id', requireAdmin, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.redirect('/admin');
+        }
+        res.render('edit-user', { user });
+    } catch (error) {
+        console.error('Error loading user:', error);
+        res.redirect('/admin');
+    }
+});
 
-// Admin routes
+// Handle edit form submission
+app.post('/admin/users/edit/:id', requireAdmin, async (req, res) => {
+    try {
+        const { username, isAdmin } = req.body;
+        const user = await User.findById(req.params.id);
+        
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        user.username = username;
+        user.isAdmin = !!isAdmin;
+        user.updatedAt = new Date();
+        
+        await user.save();
+        res.redirect('/admin');
+    } catch (error) {
+        console.error('Error updating user:', error);
+        res.status(500).json({ error: 'Failed to update user' });
+    }
+});
+
+// Move general routes after specific routes
 app.get('/admin/users', requireAdmin, async (req, res) => {
-  const users = await User.find({ deletedAt: null });
-  res.render('admin/users', { users });
+    const users = await User.find({ deletedAt: null });
+    res.render('admin/users', { users });
 });
 
 app.post('/admin/users', requireAdmin, async (req, res) => {
@@ -224,7 +264,7 @@ app.post('/admin/users', requireAdmin, async (req, res) => {
     isAdmin: !!isAdmin,
     createdAt: new Date()
   });
-  res.redirect('/admin/users');
+  res.redirect('/admin');
 });
 
 app.delete('/admin/users/:id', requireAdmin, async (req, res) => {
@@ -257,3 +297,5 @@ app.get('/logout', (req, res) => {
 app.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
 });
+// Optional: Function to handle editing user details on the client-side
+// You can implement a modal or another form as needed
